@@ -65,24 +65,24 @@ namespace MetadataScanner.Interfaces
             return query.ToList();
         }
 
-        public override bool ImplementsInterface(ILocalTypeEntity theInterface)
+        public override bool ImplementsInterface(ILocalTypeEntity entity)
         {
-            if (theInterface is TypeDef otherInterface && !otherInterface.IsInterface) {
+            if (entity is TypeDef otherInterface && !otherInterface.IsInterface) {
                 return false;
             }
 
-            if (InterfaceImplementations.Contains(theInterface)) {
+            if (InterfaceImplementations.Contains(entity)) {
                 return true;
             }
 
             foreach (var implementation in InterfaceImplementations) {
-                if (implementation.ImplementsInterface(theInterface)) {
+                if (implementation.ImplementsInterface(entity)) {
                     return true;
                 }
             }
 
             if (BaseType?.ResolutionStatus == ResolutionStatus.Resolved) {
-                if (BaseType.ImplementsInterface(theInterface)) {
+                if (BaseType.ImplementsInterface(entity)) {
                     return true;
                 }
             }

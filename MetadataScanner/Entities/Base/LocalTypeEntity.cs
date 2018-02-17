@@ -39,9 +39,9 @@ namespace MetadataScanner.Entities.Base
 
         public abstract bool ImplementsInterface(ILocalTypeEntity entity);
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return Equals(other as ILocalTypeEntity);
+            return Equals(obj as ILocalTypeEntity);
         }
 
         public bool Equals(ILocalTypeEntity other)
