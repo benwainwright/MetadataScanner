@@ -12,7 +12,7 @@ namespace MetadataScanner.Interfaces
     using System.Collections.Generic;
     using System.Reflection;
 
-    public interface IAssemblyRef : ITypeEntity
+    public interface IAssemblyRef : IResolveableEntity
     {
         string Culture { get; }
 

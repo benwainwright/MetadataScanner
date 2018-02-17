@@ -9,16 +9,17 @@
 namespace MetadataScanner.Entities.Base
 {
     using System;
+    using MetadataScanner.Enums;
     using MetadataScanner.Interfaces;
 
-    internal abstract class LocalTypeEntity : TypeEntity, IEquatable<ILocalTypeEntity>, ILocalTypeEntity
+    internal abstract class LocalTypeEntity : ResolveableEntity, IEquatable<ILocalTypeEntity>, ILocalTypeEntity
     {
         private const int HashingPrimeSeventeen = 17;
 
         private const int HashingPrimeTwentyThree = 23;
 
         public LocalTypeEntity(string name, string theNamespace, int token)
-            : base(name, token)
+            : base(name, token, ResolutionStatus.Resolved)
         {
             DeclaredNamespace = theNamespace;
         }

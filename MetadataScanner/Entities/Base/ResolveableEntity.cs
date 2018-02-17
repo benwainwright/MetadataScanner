@@ -11,20 +11,38 @@ namespace MetadataScanner.Entities.Base
     using MetadataScanner.Enums;
     using MetadataScanner.Interfaces;
 
-    internal abstract class EntityWithToken : IEntityWithToken
+    internal abstract class ResolveableEntity : IResolveableEntity
     {
-        public EntityWithToken(int token, ResolutionStatus resolutionStatus)
+        public ResolveableEntity(string name, int token, ResolutionStatus resolutionStatus)
         {
+            Name = name;
             Token = token;
             ResolutionStatus = resolutionStatus;
         }
 
-        public EntityWithToken(ResolutionStatus resolutionStatus)
+        public ResolveableEntity(string name, int token)
+            : this(name, token, ResolutionStatus.Resolved)
         {
-            ResolutionStatus = resolutionStatus;
+        }
+
+        public ResolveableEntity(int token)
+            : this(null, token, ResolutionStatus.UnResolved)
+        {
+        }
+
+        public ResolveableEntity(string name)
+            : this(name, 0, ResolutionStatus.UnResolved)
+        {
+        }
+
+        public ResolveableEntity(ResolutionStatus resolutionStatus)
+            : this(null, 0, resolutionStatus)
+        {
         }
 
         public int Token { get; }
+
+        public string Name { get; }
 
         public ResolutionStatus ResolutionStatus { get; }
     }

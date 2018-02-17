@@ -8,8 +8,14 @@
  */
 namespace MetadataScanner.Interfaces
 {
-    public interface ITypeEntity : IEntityWithToken
+    using MetadataScanner.Enums;
+
+    public interface IResolveableEntity
     {
+        ResolutionStatus ResolutionStatus { get; }
+
+        int Token { get; }
+
         string Name { get; }
     }
 }

@@ -16,7 +16,7 @@ namespace MetadataScanner.Interfaces
     using System.Reflection.Metadata.Ecma335;
     using MetadataScanner.Entities.Base;
 
-    internal class AssemblyRef : TypeEntity, IAssemblyRef
+    internal class AssemblyRef : ResolveableEntity, IAssemblyRef
     {
         public AssemblyRef(MetadataReader reader, AssemblyReferenceHandle handle)
             : base(

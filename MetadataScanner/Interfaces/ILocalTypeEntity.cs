@@ -8,7 +8,7 @@
  */
 namespace MetadataScanner.Interfaces
 {
-    public interface ILocalTypeEntity : ITypeEntity
+    public interface ILocalTypeEntity : IResolveableEntity
     {
         string DeclaredNamespace { get; }
 
