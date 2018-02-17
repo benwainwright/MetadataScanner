@@ -6,7 +6,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner
+namespace MetadataScanner.Lib
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace MetadataScanner
     using System.Linq;
     using MetadataScanner.Interfaces;
 
-    public class Scanner
+    internal class Scanner : IAssemblyScanner
     {
         private List<string> paths = new List<string>();
 
