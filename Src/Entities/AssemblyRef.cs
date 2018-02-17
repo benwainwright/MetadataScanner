@@ -6,7 +6,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner.Entities
+namespace MetadataScanner.Interfaces
 {
     using System;
     using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace MetadataScanner.Entities
     using System.Reflection.Metadata.Ecma335;
     using MetadataScanner.Entities.Base;
 
-    public class AssemblyRef : TypeEntity
+    internal class AssemblyRef : TypeEntity, IAssemblyRef
     {
         public AssemblyRef(MetadataReader reader, AssemblyReferenceHandle handle)
             : base(
@@ -30,7 +30,7 @@ namespace MetadataScanner.Entities
             Flags = reference.Flags;
         }
 
-        public AssemblyMetadata MetaData { get; private set; }
+        public IAssembly MetaData { get; private set; }
 
         public string Culture { get; }
 
@@ -49,7 +49,7 @@ namespace MetadataScanner.Entities
             return query.ToList();
         }
 
-        public void LinkAssemblyMetaData(IEnumerable<AssemblyMetadata> assemblies)
+        public void LinkAssemblyMetaData(IEnumerable<IAssembly> assemblies)
         {
             if (MetaData != null) {
                 return;

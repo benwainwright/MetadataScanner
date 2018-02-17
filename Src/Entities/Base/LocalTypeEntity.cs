@@ -9,8 +9,9 @@
 namespace MetadataScanner.Entities.Base
 {
     using System;
+    using MetadataScanner.Interfaces;
 
-    public abstract class LocalTypeEntity : TypeEntity, IEquatable<LocalTypeEntity>
+    internal abstract class LocalTypeEntity : TypeEntity, IEquatable<ILocalTypeEntity>, ILocalTypeEntity
     {
         private const int HashingPrimeSeventeen = 17;
 
@@ -19,13 +20,13 @@ namespace MetadataScanner.Entities.Base
         public LocalTypeEntity(string name, string theNamespace, int token)
             : base(name, token)
         {
-            Namespace = theNamespace;
+            DeclaredNamespace = theNamespace;
         }
 
         public LocalTypeEntity(string name, string theNamespace)
             : base(name)
         {
-            Namespace = theNamespace;
+            DeclaredNamespace = theNamespace;
         }
 
         public LocalTypeEntity(int token)
@@ -33,16 +34,16 @@ namespace MetadataScanner.Entities.Base
         {
         }
 
-        public string Namespace { get; }
+        public string DeclaredNamespace { get; }
 
-        public abstract bool ImplementsInterface(LocalTypeEntity entity);
+        public abstract bool ImplementsInterface(ILocalTypeEntity entity);
 
         public override bool Equals(object other)
         {
-            return Equals(other as LocalTypeEntity);
+            return Equals(other as ILocalTypeEntity);
         }
 
-        public bool Equals(LocalTypeEntity other)
+        public bool Equals(ILocalTypeEntity other)
         {
             if (other == null) {
                 return false;
@@ -53,7 +54,7 @@ namespace MetadataScanner.Entities.Base
             }
 
             return other.Name.Equals(Name, StringComparison.InvariantCulture) &&
-                   other.Namespace.Equals(Namespace, StringComparison.InvariantCulture);
+                   other.DeclaredNamespace.Equals(DeclaredNamespace, StringComparison.InvariantCulture);
         }
 
         public override int GetHashCode()

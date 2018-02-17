@@ -9,8 +9,9 @@
 namespace MetadataScanner.Entities.Base
 {
     using MetadataScanner.Enums;
+    using MetadataScanner.Interfaces;
 
-    public class TypeEntity : EntityWithToken
+    internal class TypeEntity : EntityWithToken, ITypeEntity
     {
         public TypeEntity(string name, int token)
             : base(token, ResolutionStatus.Resolved)

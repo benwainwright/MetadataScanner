@@ -6,17 +6,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner.Entities
+namespace MetadataScanner.Interfaces
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
-    using MetadataScanner.Entities.Base;
     using MetadataScanner.Enums;
+    using MetadataScanner.Entities.Base;
 
-    public class TypeRef : LocalTypeEntity
+    internal class TypeRef : LocalTypeEntity, ITypeRef
     {
         public TypeRef(MetadataReader reader, TypeReferenceHandle handle, IEnumerable<AssemblyRef> assemblies)
             : base(
@@ -26,12 +26,12 @@ namespace MetadataScanner.Entities
         {
             var reference = reader.GetTypeReference(handle);
             Assembly = GetAssembly(assemblies, reader.GetToken(reference.ResolutionScope));
-            Definition = new TypeDef(Name, Namespace);
+            Definition = new TypeDef(Name, DeclaredNamespace);
         }
 
-        public AssemblyRef Assembly { get; }
+        public IAssemblyRef Assembly { get; }
 
-        public TypeDef Definition { get; private set; }
+        public ITypeDef Definition { get; private set; }
 
         public static List<TypeRef> LoadReferences(MetadataReader reader, IEnumerable<AssemblyRef> assemblies)
         {
@@ -42,7 +42,7 @@ namespace MetadataScanner.Entities
             return query.ToList();
         }
 
-        public override bool ImplementsInterface(LocalTypeEntity entity)
+        public override bool ImplementsInterface(ILocalTypeEntity entity)
         {
             if (Definition.ResolutionStatus != ResolutionStatus.UnResolved) {
                 return Definition.ImplementsInterface(entity);
@@ -67,7 +67,7 @@ namespace MetadataScanner.Entities
             var query = from type
                         in defined
                         where type.Name.Equals(Name, StringComparison.InvariantCulture) &&
-                              type.Namespace.Equals(Namespace, StringComparison.InvariantCulture)
+                              type.DeclaredNamespace.Equals(DeclaredNamespace, StringComparison.InvariantCulture)
                         select type;
 
             Definition = query.FirstOrDefault();
@@ -78,7 +78,7 @@ namespace MetadataScanner.Entities
             return $"{Name}";
         }
 
-        private static AssemblyRef GetAssembly(IEnumerable<AssemblyRef> assemblies, int token)
+        private static IAssemblyRef GetAssembly(IEnumerable<IAssemblyRef> assemblies, int token)
         {
             var query = from assembly
                         in assemblies

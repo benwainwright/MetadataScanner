@@ -6,21 +6,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner.Entities
+namespace MetadataScanner.Interfaces
 {
-    using MetadataScanner.Entities.Base;
-    using MetadataScanner.Interfaces;
+    using System;
+    using System.Collections.Generic;
 
-    internal class AmbiguousLocalType : LocalTypeEntity
+    public interface IAssembly
     {
-        public AmbiguousLocalType(int token)
-            : base(token)
-        {
-        }
+        string FilePath { get; }
 
-        public override bool ImplementsInterface(ILocalTypeEntity entity)
-        {
-            return false;
-        }
+        string Name { get; }
+
+        Version Version { get; }
+
+        List<byte> PublicKey { get; }
+
+        IEnumerable<IAssemblyRef> AssemblyReferences { get; }
+
+        IEnumerable<ITypeDef> TypeDefinitions { get; }
+
+        IEnumerable<ITypeRef> TypeReferences { get; }
     }
 }

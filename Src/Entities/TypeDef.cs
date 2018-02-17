@@ -6,19 +6,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner.Entities
+namespace MetadataScanner.Interfaces
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
+    using MetadataScanner.Entities;
     using MetadataScanner.Entities.Base;
     using MetadataScanner.Enums;
 
-    public class TypeDef : LocalTypeEntity
+    internal class TypeDef : LocalTypeEntity, ITypeDef
     {
         private readonly TypeDefinition definition;
+
+        private List<LocalTypeEntity> interfaceImplementations = new List<LocalTypeEntity>();
 
         public TypeDef(MetadataReader reader, TypeDefinitionHandle handle)
             : base(
@@ -31,7 +34,7 @@ namespace MetadataScanner.Entities
             Attributes = definition.Attributes;
             foreach (var implementation in definition.GetInterfaceImplementations()) {
                 var newInterface = new AmbiguousLocalType(reader.GetToken(reader.GetInterfaceImplementation(implementation).Interface));
-                InterfaceImplementations.Add(newInterface);
+                interfaceImplementations.Add(newInterface);
             }
         }
 
@@ -45,13 +48,13 @@ namespace MetadataScanner.Entities
         {
         }
 
-        public LocalTypeEntity BaseType { get; private set; }
+        public ILocalTypeEntity BaseType { get; private set; }
 
         public TypeAttributes Attributes { get; }
 
         public bool IsInterface => (Attributes & TypeAttributes.Interface) != 0;
 
-        public List<LocalTypeEntity> InterfaceImplementations { get; private set; } = new List<LocalTypeEntity>();
+        public IEnumerable<ILocalTypeEntity> InterfaceImplementations => interfaceImplementations;
 
         public static List<TypeDef> LoadDefinitions(MetadataReader reader)
         {
@@ -62,7 +65,7 @@ namespace MetadataScanner.Entities
             return query.ToList();
         }
 
-        public override bool ImplementsInterface(LocalTypeEntity theInterface)
+        public override bool ImplementsInterface(ILocalTypeEntity theInterface)
         {
             if (theInterface is TypeDef otherInterface && !otherInterface.IsInterface) {
                 return false;
@@ -104,7 +107,7 @@ namespace MetadataScanner.Entities
         public void LinkInterfaceImplementations(List<LocalTypeEntity> types)
         {
             var unresolved = from implementation
-                             in InterfaceImplementations
+                             in interfaceImplementations
                              where implementation.ResolutionStatus == ResolutionStatus.UnResolved
                              select implementation;
 
@@ -124,10 +127,10 @@ namespace MetadataScanner.Entities
             }
 
             foreach (var unresolvedItem in remove) {
-                InterfaceImplementations.Remove(unresolvedItem);
+                interfaceImplementations.Remove(unresolvedItem);
             }
 
-            InterfaceImplementations.AddRange(resolved);
+            interfaceImplementations.AddRange(resolved);
         }
 
         public override string ToString()
