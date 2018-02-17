@@ -1,6 +1,7 @@
 namespace MetadataScanner.Test
 {
     using System.Collections.Generic;
+    using System.Linq;
     using MetadataScanner.Interfaces;
     using Moq;
     using NUnit.Framework;

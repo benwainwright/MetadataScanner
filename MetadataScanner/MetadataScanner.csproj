@@ -16,4 +16,19 @@
 	  <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />  
   </ItemGroup>
 
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageVersion>0.0.0.1</PackageVersion>
+    <PackageId>MetadataScanner.Bw</PackageId>
+    <Title>.Net Assembly Metadata Scanner</Title>
+    <Authors>benwainwright</Authors>
+    <Description>A .NET assembly metainformation scanning API wrapped around System.Reflection.Metadata</Description>
+    <Copyright>© Ben Wainwright 2018</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/benwainwright/MetadataScanner</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/benwainwright/MetadataScanner</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
 </Project>
