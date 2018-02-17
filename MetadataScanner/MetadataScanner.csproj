@@ -8,6 +8,7 @@
   </PropertyGroup>
   
   <ItemGroup>
+	  <PackageReference Include="codecracker.CSharp" Version="1.0.3" />
 	  <PackageReference Include="NuGet.CommandLine" Version="4.5.1" />
 	  <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="all" />

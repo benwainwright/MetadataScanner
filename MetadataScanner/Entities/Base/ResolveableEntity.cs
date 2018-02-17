@@ -13,29 +13,29 @@ namespace MetadataScanner.Entities.Base
 
     internal abstract class ResolveableEntity : IResolveableEntity
     {
-        public ResolveableEntity(string name, int token, ResolutionStatus resolutionStatus)
+        protected ResolveableEntity(string name, int token, ResolutionStatus resolutionStatus)
         {
             Name = name;
             Token = token;
             ResolutionStatus = resolutionStatus;
         }
 
-        public ResolveableEntity(string name, int token)
+        protected ResolveableEntity(string name, int token)
             : this(name, token, ResolutionStatus.Resolved)
         {
         }
 
-        public ResolveableEntity(int token)
+        protected ResolveableEntity(int token)
             : this(null, token, ResolutionStatus.UnResolved)
         {
         }
 
-        public ResolveableEntity(string name)
+        protected ResolveableEntity(string name)
             : this(name, 0, ResolutionStatus.UnResolved)
         {
         }
 
-        public ResolveableEntity(ResolutionStatus resolutionStatus)
+        protected ResolveableEntity(ResolutionStatus resolutionStatus)
             : this(null, 0, resolutionStatus)
         {
         }

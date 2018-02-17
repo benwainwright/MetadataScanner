@@ -18,19 +18,19 @@ namespace MetadataScanner.Entities.Base
 
         private const int HashingPrimeTwentyThree = 23;
 
-        public LocalTypeEntity(string name, string theNamespace, int token)
+        protected LocalTypeEntity(string name, string theNamespace, int token)
             : base(name, token, ResolutionStatus.Resolved)
         {
             DeclaredNamespace = theNamespace;
         }
 
-        public LocalTypeEntity(string name, string theNamespace)
+        protected LocalTypeEntity(string name, string theNamespace)
             : base(name)
         {
             DeclaredNamespace = theNamespace;
         }
 
-        public LocalTypeEntity(int token)
+        protected LocalTypeEntity(int token)
             : base(token)
         {
         }
@@ -65,7 +65,7 @@ namespace MetadataScanner.Entities.Base
         public override int GetHashCode()
         {
             unchecked {
-                int hash = HashingPrimeSeventeen;
+                var hash = HashingPrimeSeventeen;
                 hash = (HashingPrimeTwentyThree * 23) + Name.GetHashCode();
                 hash = (HashingPrimeTwentyThree * 23) + Name.GetHashCode();
                 return hash;
