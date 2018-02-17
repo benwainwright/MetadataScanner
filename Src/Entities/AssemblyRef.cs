@@ -14,7 +14,7 @@ namespace MetadataScanner.Entities
     using System.Reflection;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
-    using MetadataScanner.Base;
+    using MetadataScanner.Entities.Base;
 
     public class AssemblyRef : TypeEntity
     {

@@ -6,10 +6,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-using MetadataScanner.Entities.Base;
-
 namespace MetadataScanner.Entities
 {
+    using MetadataScanner.Entities.Base;
+
     public class AmbiguousLocalType : LocalTypeEntity
     {
         public AmbiguousLocalType(int token)

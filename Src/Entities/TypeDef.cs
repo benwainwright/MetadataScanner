@@ -51,6 +51,17 @@ namespace MetadataScanner.Entities
 
         public bool IsInterface => (Attributes & TypeAttributes.Interface) != 0;
 
+        public List<LocalTypeEntity> InterfaceImplementations { get; private set; } = new List<LocalTypeEntity>();
+
+        public static List<TypeDef> LoadDefinitions(MetadataReader reader)
+        {
+            var query = from definition
+                        in reader.TypeDefinitions
+                        select new TypeDef(reader, definition);
+
+            return query.ToList();
+        }
+
         public override bool ImplementsInterface(LocalTypeEntity theInterface)
         {
             if (theInterface is TypeDef otherInterface && !otherInterface.IsInterface) {
@@ -74,17 +85,6 @@ namespace MetadataScanner.Entities
             }
 
             return false;
-        }
-
-        public List<LocalTypeEntity> InterfaceImplementations { get; private set; } = new List<LocalTypeEntity>();
-
-        public static List<TypeDef> LoadDefinitions(MetadataReader reader)
-        {
-            var query = from definition
-                        in reader.TypeDefinitions
-                        select new TypeDef(reader, definition);
-
-            return query.ToList();
         }
 
         public void LinkBaseType(List<LocalTypeEntity> types)
