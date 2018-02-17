@@ -13,8 +13,8 @@ namespace MetadataScanner.Interfaces
     using System.Linq;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
-    using MetadataScanner.Enums;
     using MetadataScanner.Entities.Base;
+    using MetadataScanner.Enums;
 
     internal class TypeRef : LocalTypeEntity, ITypeRef
     {
