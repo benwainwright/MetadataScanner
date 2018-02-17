@@ -20,9 +20,9 @@ namespace MetadataScanner
 
         private Dictionary<string, AssemblyMetadata> assemblies = new Dictionary<string, AssemblyMetadata>();
 
-        public Scanner(List<string> paths)
+        public Scanner(params string[] paths)
         {
-            paths.AddRange(paths);
+            this.paths.AddRange(paths.ToList());
         }
 
         public IEnumerable<string> Paths => paths;

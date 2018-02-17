@@ -11,20 +11,16 @@ namespace MetadataScanner
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.MemoryMappedFiles;
     using System.Linq;
     using System.Reflection.Metadata;
     using System.Reflection.PortableExecutable;
-    using System.Runtime.InteropServices;
     using MetadataScanner.Entities.Base;
     using MetadataScanner.Interfaces;
 
     internal class AssemblyMetadata : IAssembly
     {
-        private readonly MetadataReader reader;
-
-        private byte[] buffer;
-
-        private GCHandle pinnedHandle;
+        private const string MapNamePrefix = "ASSEMBLY_SCANNER_MAP_";
 
         private List<AssemblyRef> assemblyReferences;
 
@@ -32,11 +28,13 @@ namespace MetadataScanner
 
         private List<TypeRef> typeReferences;
 
-        public AssemblyMetadata(string path)
+        public AssemblyMetadata(
+            string path,
+            MetadataReaderOptions options = MetadataReaderOptions.Default,
+            MetadataStringDecoder decoder = null)
         {
             FilePath = path;
-            reader = LoadMetadataReader(FilePath);
-            ParseAll();
+            LoadReaderAndParseMetadataFromAssembly(path, options, decoder);
         }
 
         public string FilePath { get; }
@@ -64,19 +62,45 @@ namespace MetadataScanner
             }
         }
 
-        public void ParseAll()
+        public unsafe void LoadReaderAndParseMetadataFromAssembly(
+            string filename,
+            MetadataReaderOptions options,
+            MetadataStringDecoder decoder)
         {
-            ParseAssemblyDefinition();
+            using (var file = LoadAssembly(filename, out var length, out var access)) {
+                using (var stream = file.CreateViewStream(0, length, access)) {
+                    var headers = new PEHeaders(stream);
+                    var start = (byte*)0;
+                    stream.SafeMemoryMappedViewHandle.AcquirePointer(ref start);
+                    var size = headers.MetadataSize;
+                    var reader = new MetadataReader(start + headers.MetadataStartOffset, size, options, decoder);
+                    PopulateMetaDataFromReader(reader);
+                }
+            }
+        }
+
+        public void PopulateMetaDataFromReader(MetadataReader reader)
+        {
+            ParseAssemblyDefinition(reader);
             assemblyReferences = AssemblyRef.LoadReferences(reader);
             typeDefinitions = TypeDef.LoadDefinitions(reader);
             typeReferences = TypeRef.LoadReferences(reader, assemblyReferences);
             LinkTypes(typeDefinitions, typeReferences);
-            pinnedHandle.Free();
         }
 
         public override string ToString()
         {
             return $"{Name} {Version}";
+        }
+
+        private static MemoryMappedFile LoadAssembly(string filename, out long length, out MemoryMappedFileAccess access)
+        {
+            var fileInfo = new FileInfo(filename);
+            length = fileInfo.Length;
+            var mapName = MapNamePrefix + fileInfo.Name;
+            var mode = FileMode.Open;
+            access = MemoryMappedFileAccess.Read;
+            return MemoryMappedFile.CreateFromFile(filename, mode, mapName, length, access);
         }
 
         private static void LinkTypes(IEnumerable<TypeDef> definitions, IEnumerable<TypeRef> references)
@@ -91,29 +115,12 @@ namespace MetadataScanner
             }
         }
 
-        private void ParseAssemblyDefinition()
+        private void ParseAssemblyDefinition(MetadataReader reader)
         {
             var assembly = reader.GetAssemblyDefinition();
             Name = reader.GetString(assembly.Name);
             Version = assembly.Version;
             PublicKey = reader.GetBlobBytes(assembly.PublicKey).ToList();
-        }
-
-    private unsafe MetadataReader LoadMetadataReader(
-        string filename,
-        MetadataReaderOptions options = MetadataReaderOptions.Default,
-        MetadataStringDecoder decoder = null)
-        {
-            var file = new FileStream(filename, FileMode.Open);
-            var headers = new PEHeaders(file);
-            var metaDataStart = headers.MetadataStartOffset;
-            var metaDataSize = headers.MetadataSize;
-            buffer = new byte[metaDataSize];
-            pinnedHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            file.Write(buffer, metaDataStart, metaDataSize);
-            var startOffset = headers.MetadataStartOffset;
-            var startAddress = (byte*)pinnedHandle.AddrOfPinnedObject();
-            return new MetadataReader(startAddress, metaDataSize, options, decoder);
         }
     }
 }

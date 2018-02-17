@@ -53,8 +53,12 @@ namespace MetadataScanner.Entities.Base
                 return true;
             }
 
+            if (other.Name == null || Name == null) {
+                return false;
+            }
+
             return other.Name.Equals(Name, StringComparison.InvariantCulture) &&
-                   other.DeclaredNamespace.Equals(DeclaredNamespace, StringComparison.InvariantCulture);
+                   other.DeclaredNamespace?.Equals(DeclaredNamespace, StringComparison.InvariantCulture) == true;
         }
 
         public override int GetHashCode()
