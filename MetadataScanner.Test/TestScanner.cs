@@ -10,7 +10,7 @@ namespace MetadataScanner.Tests
         {
             var dir = TestContext.CurrentContext.TestDirectory;
 
-            var scanner = new Scanner(dir);
+            var scanner = AssemblyScanner.Create(dir);
             scanner.Scan();
 
             var assemblies = scanner.Assemblies;
