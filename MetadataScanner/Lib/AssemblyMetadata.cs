@@ -29,7 +29,7 @@ namespace MetadataScanner.Interfaces
 
         private List<TypeRef> typeReferences;
 
-        private Dictionary<int, ILocalTypeEntity> allTypes;
+        private Dictionary<int, ILocalTypeEntity> allTypes = new Dictionary<int, ILocalTypeEntity>();
 
         public AssemblyMetadata(
             string path,
