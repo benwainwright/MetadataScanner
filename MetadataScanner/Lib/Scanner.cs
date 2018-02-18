@@ -11,14 +11,19 @@ namespace MetadataScanner.Lib
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.MemoryMappedFiles;
     using System.Linq;
+    using System.Reflection.Metadata;
+    using System.Reflection.Metadata.Ecma335;
+    using System.Reflection.PortableExecutable;
+    using MetadataScanner.Entities;
     using MetadataScanner.Interfaces;
 
     internal class Scanner : IAssemblyScanner
     {
         private List<string> paths = new List<string>();
 
-        private Dictionary<string, AssemblyMetadata> assemblies = new Dictionary<string, AssemblyMetadata>();
+        private Dictionary<string, ScannedAssembly> assemblies = new Dictionary<string, ScannedAssembly>();
 
         public Scanner(params string[] paths)
         {
@@ -52,7 +57,7 @@ namespace MetadataScanner.Lib
             }
 
             foreach (var assembly in assemblies) {
-                assembly.Value.LinkAssemblies(assemblies.Values.ToList());
+                assembly.Value.ResolveReferences(Assemblies.ToList());
             }
         }
 
@@ -67,7 +72,7 @@ namespace MetadataScanner.Lib
         {
             var parts = file.Split('.');
             if (parts.Length > 0 && parts[parts.Length - 1].Equals("dll", StringComparison.InvariantCulture)) {
-                assemblies[file] = new AssemblyMetadata(file);
+                assemblies[file] = AssemblyFactory.LoadAssembly(file);
             }
         }
     }

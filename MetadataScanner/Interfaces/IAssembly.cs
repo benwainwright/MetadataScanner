@@ -11,20 +11,18 @@ namespace MetadataScanner.Interfaces
     using System;
     using System.Collections.Generic;
 
-    public interface IAssembly
+    public interface IAssembly : IResolveableEntity<string, IAssembly>, IEquatable<IAssembly>
     {
         string FilePath { get; }
-
-        string Name { get; }
 
         Version Version { get; }
 
         List<byte> PublicKey { get; }
 
-        IEnumerable<IAssemblyRef> AssemblyReferences { get; }
+        IEnumerable<IAssembly> AssemblyReferences { get; }
 
-        IEnumerable<ITypeDef> TypeDefinitions { get; }
+        IEnumerable<IType> TypeDefinitions { get; }
 
-        IEnumerable<ITypeRef> TypeReferences { get; }
+        IEnumerable<IType> TypeReferences { get; }
     }
 }

@@ -8,10 +8,22 @@
 
   <ItemGroup>
     <None Remove="Assets\Dummy.CleanIoc.Core.dll" />
+    <None Remove="Assets\Dummy.CleanIoc.Sample.App.dll" />
+    <None Remove="Assets\Dummy.CleanIoc.Sample.Interfaces.dll" />
+    <None Remove="Assets\Dummy.CleanIoc.Sample.Library.dll" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\Dummy.CleanIoc.Core.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Dummy.CleanIoc.Sample.App.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Dummy.CleanIoc.Sample.Interfaces.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Dummy.CleanIoc.Sample.Library.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

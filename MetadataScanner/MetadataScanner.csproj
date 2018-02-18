@@ -20,6 +20,10 @@
 	  <PackageReference Include="System.Reflection.Metadata" Version="1.5.0" />
 	  <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />  
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Entities\Base\" />
+  </ItemGroup>
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>

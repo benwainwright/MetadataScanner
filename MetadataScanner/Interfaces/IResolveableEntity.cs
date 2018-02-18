@@ -8,9 +8,10 @@
  */
 namespace MetadataScanner.Interfaces
 {
+    using System.Collections.Generic;
     using MetadataScanner.Enums;
 
-    public interface IResolveableEntity
+    public interface IResolveableEntity<TKey, TEntity> : IResolveable<Dictionary<TKey, TEntity>>
     {
         ResolutionStatus ResolutionStatus { get; }
 
