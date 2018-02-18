@@ -69,6 +69,8 @@ namespace MetadataScanner.Entities
 
         public IEnumerable<IType> InterfaceImplementations => Target?.InterfaceImplementations ?? interfaces;
 
+        public bool IsAbstract => Target?.IsAbstract ?? (attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract;
+
         public bool IsInterface => Target?.IsInterface ?? (attributes & TypeAttributes.Interface) == TypeAttributes.Interface;
 
         public bool IsLocal => Target?.IsLocal ?? isLocal;
@@ -101,9 +103,37 @@ namespace MetadataScanner.Entities
                    other.Assembly.Equals(Assembly);
         }
 
+        public bool IsSubclassOf(IType entity)
+        {
+            Guard.Against.Null(entity, nameof(entity));
+
+            if (entity.Equals(baseType)) {
+                return true;
+            }
+
+            if (entity.BaseType.IsSubclassOf(entity)) {
+                return true;
+            }
+
+            if (entity.IsInterface && ImplementsInterface(entity)) {
+                return true;
+            }
+
+            return false;
+        }
+
         public bool ImplementsInterface(IType entity)
         {
-            DebugGuard.Against.Null(entity, nameof(entity));
+            Guard.Against.Null(entity, nameof(entity));
+
+            if (!entity.IsInterface) {
+                throw new InvalidOperationException($"{entity} is not an interface type");
+            }
+
+            if (entity == this) {
+                return false;
+            }
+
             if (InterfaceImplementations?.Contains(entity) == true) {
                 return true;
             }

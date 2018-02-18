@@ -1,8 +1,6 @@
 ﻿namespace MetadataScanner.Entities
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using MetadataScanner.Enums;
     using MetadataScanner.Interfaces;
     using MetadataScanner.Utils;

@@ -11,13 +11,9 @@ namespace MetadataScanner.Lib
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.IO.MemoryMappedFiles;
     using System.Linq;
-    using System.Reflection.Metadata;
-    using System.Reflection.Metadata.Ecma335;
-    using System.Reflection.PortableExecutable;
-    using MetadataScanner.Entities;
     using MetadataScanner.Interfaces;
+    using MetadataScanner.Utils;
 
     internal class Scanner : IAssemblyScanner
     {
@@ -36,11 +32,13 @@ namespace MetadataScanner.Lib
 
         public void AddPath(string path)
         {
+            Guard.Against.Null(path, nameof(path));
             paths.Add(path);
         }
 
         public void AddPaths(List<string> paths)
         {
+            Guard.Against.Null(paths, nameof(paths));
             this.paths.AddRange(paths);
         }
 

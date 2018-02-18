@@ -11,6 +11,8 @@
 
         bool IsLocal { get; }
 
+        bool IsAbstract { get; }
+
         TypeAttributes Attributes { get; }
 
         IType BaseType { get; }
@@ -22,5 +24,7 @@
         string ToString();
 
         bool ImplementsInterface(IType entity);
+
+        bool IsSubclassOf(IType entity);
     }
 }
