@@ -95,7 +95,9 @@ namespace MetadataScanner.Interfaces
                 return;
             }
 
-            BaseType = types[BaseType.Token];
+            if (types.ContainsKey(BaseType.Token)) {
+                BaseType = types[BaseType.Token];
+            }
         }
 
         public void LinkInterfaceImplementations(Dictionary<int, ILocalTypeEntity> types)
