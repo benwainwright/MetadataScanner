@@ -58,13 +58,13 @@ namespace MetadataScanner.Interfaces
 
         public List<byte> PublicKey { get; private set; }
 
-        public AssemblyFlags Flags { get; private set; }
+        public AssemblyFlags Flags { get; }
 
-        public string Culture { get; private set; }
+        public string Culture { get; }
 
-        public int Token { get; private set; }
+        public int Token { get;  }
 
-        public ResolutionStatus ResolutionStatus { get; private set; }
+        public ResolutionStatus ResolutionStatus { get; }
 
         public IEnumerable<IAssembly> AssemblyReferences => assemblyReferences.Values;
 
@@ -96,16 +96,6 @@ namespace MetadataScanner.Interfaces
                     }
                 }
             }
-        }
-
-        public void ResolveExternal(Dictionary<string, IAssembly> assemblies)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResolveLocal(Dictionary<string, IAssembly> sourceType)
-        {
-            throw new NotImplementedException();
         }
 
         public override string ToString()

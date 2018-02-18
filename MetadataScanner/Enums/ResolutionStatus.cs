@@ -11,8 +11,6 @@ namespace MetadataScanner.Enums
     public enum ResolutionStatus
     {
         Resolved,
-        UnResolved,
-        LocalReference,
-        ExternalType
+        UnResolved
     }
 }

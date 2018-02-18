@@ -1,4 +1,12 @@
-﻿namespace MetadataScanner.Entities
+﻿/*
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+namespace MetadataScanner.Entities
 {
     using System;
     using System.Collections.Generic;
@@ -6,36 +14,23 @@
     using System.Reflection;
     using MetadataScanner.Enums;
     using MetadataScanner.Interfaces;
+    using MetadataScanner.Utils;
 
     public class ScannedType : MetadataEntity, IType, IEquatable<IType>
     {
-        private readonly List<IType> interfaces = new List<IType>();
-
-        private readonly IType baseType;
+        private readonly IAssembly assembly;
 
         private readonly TypeAttributes attributes;
 
-        private readonly IAssembly assembly;
+        private readonly IType baseType;
 
         private readonly string definedNamespace;
+
+        private readonly List<IType> interfaces = new List<IType>();
 
         private readonly bool isLocal;
 
         private readonly string name;
-
-        private IType _target;
-
-        private IType target
-        {
-            get
-            {
-                return _target;
-            }
-            set
-            {
-                _target = value;
-            }
-        }
 
         public ScannedType(
             int token,
@@ -66,68 +61,33 @@
             ResolutionStatus = ResolutionStatus.UnResolved;
         }
 
-        public string Name => target?.Name ?? name;
+        public IAssembly Assembly => Target?.Assembly ?? assembly;
 
-        public IType BaseType => target?.BaseType ?? baseType;
+        public TypeAttributes Attributes => Target?.Attributes ?? attributes;
 
-        public TypeAttributes Attributes => target?.Attributes ?? attributes;
+        public IType BaseType => Target?.BaseType ?? baseType;
 
-        public IEnumerable<IType> InterfaceImplementations => target?.InterfaceImplementations ?? interfaces;
+        public IEnumerable<IType> InterfaceImplementations => Target?.InterfaceImplementations ?? interfaces;
 
-        public IAssembly Assembly => target?.Assembly ?? assembly;
+        public bool IsInterface => Target?.IsInterface ?? (attributes & TypeAttributes.Interface) == TypeAttributes.Interface;
 
-        public string Namespace => target?.Namespace ?? definedNamespace;
+        public bool IsLocal => Target?.IsLocal ?? isLocal;
 
-        public bool IsLocal => target?.IsLocal ?? isLocal;
+        public string Name => Target?.Name ?? name;
 
-        public bool IsInterface => target?.IsInterface ?? (attributes & TypeAttributes.Interface) == TypeAttributes.Interface;
+        public string Namespace => Target?.Namespace ?? definedNamespace;
 
-        public void ResolveLocal(Dictionary<int, IType> entities)
+        public IType AsInterface()
         {
-            if (ResolutionStatus == ResolutionStatus.UnResolved) {
-                if (entities.ContainsKey(Token)) {
-                    target = entities[Token];
-                    ResolutionStatus = ResolutionStatus.Resolved;
-                }
-            }
-
-            ResolveChildren(entities);
-        }
-
-        public void ResolveExternal(Dictionary<int, IType> entities)
-        {
-            if (!IsLocal && ResolutionStatus == ResolutionStatus.UnResolved) {
-                var query = from type
-                            in entities.Values
-                            where type.Name.Equals(name, StringComparison.InvariantCulture) &&
-                                    type.Namespace.Equals(definedNamespace, StringComparison.InvariantCulture) &&
-                                    type.IsLocal
-                            select type;
-                target = query.FirstOrDefault();
-                if (query.Any()) {
-                    target = query.First();
-                    ResolutionStatus = ResolutionStatus.Resolved;
-                }
-            }
-        }
-
-        public bool ImplementsInterface(IType entity)
-        {
-            if (InterfaceImplementations?.Contains(entity) == true) {
-                return true;
-            }
-
-            if (BaseType?.ImplementsInterface(entity) == true) {
-                return true;
-            }
-
-            return false;
+            return this;
         }
 
         public override bool Equals(object obj) => Equals(obj as IType);
 
         public bool Equals(IType other)
         {
+            DebugGuard.Against.Null(other, nameof(other));
+
             if (other == null) {
                 return false;
             }
@@ -141,28 +101,58 @@
                    other.Assembly.Equals(Assembly);
         }
 
+        public bool ImplementsInterface(IType entity)
+        {
+            DebugGuard.Against.Null(entity, nameof(entity));
+            if (InterfaceImplementations?.Contains(entity) == true) {
+                return true;
+            }
+
+            if (BaseType?.ImplementsInterface(entity) == true) {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void ResolveExternal(Dictionary<int, IType> entities)
+        {
+            DebugGuard.Against.Null(entities, nameof(entities));
+
+            if (!IsLocal && ResolutionStatus == ResolutionStatus.UnResolved) {
+                var query = from type
+                            in entities.Values
+                            where type.Name.Equals(name, StringComparison.InvariantCulture) &&
+                                   type.Namespace.Equals(definedNamespace, StringComparison.InvariantCulture) &&
+                                   type.IsLocal
+                            select type;
+                if (query.Any()) {
+                    Target = query.First();
+                }
+            }
+        }
+
+        public void ResolveLocal(Dictionary<int, IType> entities)
+        {
+            DebugGuard.Against.Null(entities, nameof(entities));
+
+            if (ResolutionStatus == ResolutionStatus.UnResolved) {
+                if (entities.ContainsKey(Token)) {
+                    Target = entities[Token];
+                }
+            }
+
+            ResolveChildren(entities);
+        }
+
         public override string ToString()
         {
             return $"{Name}";
         }
 
-        public IType AsInterface()
-        {
-            return this;
-        }
-
-        private static IType ResolveExternalEntity(Dictionary<int, IType> entities, string name, string theNamespace)
-        {
-            var query = from type
-                        in entities.Values
-                        where type.Name.Equals(name, StringComparison.InvariantCulture) &&
-                                type.Namespace.Equals(theNamespace, StringComparison.InvariantCulture)
-                        select type;
-            return query.FirstOrDefault();
-        }
-
         private void ResolveChildren(Dictionary<int, IType> entities)
         {
+            Guard.Against.Null(entities, nameof(entities));
             baseType?.ResolveLocal(entities);
 
             foreach (var implementation in interfaces) {
