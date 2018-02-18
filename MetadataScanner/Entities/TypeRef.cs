@@ -25,7 +25,11 @@ namespace MetadataScanner.Interfaces
                 reader.GetToken(handle))
         {
             var reference = reader.GetTypeReference(handle);
-            Assembly = assemblies[reader.GetToken(reference.ResolutionScope)];
+            var assemblyToken = reader.GetToken(reference.ResolutionScope);
+            if (assemblies.ContainsKey(assemblyToken)) {
+                Assembly = assemblies[assemblyToken];
+            }
+
             Definition = new TypeDef(Name, DeclaredNamespace);
         }
 
