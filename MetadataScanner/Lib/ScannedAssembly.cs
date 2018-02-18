@@ -41,6 +41,7 @@ namespace MetadataScanner.Interfaces
             Token = reader.GetToken(handle);
             Version = reference.Version;
             Flags = reference.Flags;
+            ResolutionStatus = ResolutionStatus.UnResolved;
         }
 
         public ScannedAssembly(string path, MetadataReader reader)
@@ -89,8 +90,10 @@ namespace MetadataScanner.Interfaces
         public void ResolveReferences(List<IAssembly> assemblies)
         {
             foreach (var assembly in assemblies) {
-                foreach (var reference in assembly.TypeReferences) {
-                    reference.ResolveExternal(allTypes);
+                if (!assembly.Equals(this)) {
+                    foreach (var reference in assembly.TypeReferences) {
+                        reference.ResolveExternal(allTypes);
+                    }
                 }
             }
         }
@@ -112,7 +115,9 @@ namespace MetadataScanner.Interfaces
 
         public bool Equals(IAssembly other)
         {
-            throw new NotImplementedException();
+            return other.Name.Equals(Name, StringComparison.InvariantCulture) &&
+                   other.PublicKey.SequenceEqual(PublicKey) &&
+                   other.Version.Equals(Version);
         }
 
         private static List<IType> LoadDefinedTypes(MetadataReader reader, IAssembly assembly)
@@ -152,9 +157,10 @@ namespace MetadataScanner.Interfaces
                              let reference = reader.GetTypeReference(handle)
                              select new ScannedType(
                                  token: reader.GetToken(handle),
-                                 isLocal: true,
+                                 isLocal: false,
                                  name: reader.GetString(reference.Name),
                                  theNamespace: reader.GetString(reference.Namespace),
+                                 resolutionStatus: ResolutionStatus.UnResolved,
                                  assembly: new ScannedAssembly(reader.GetToken(reference.ResolutionScope))).AsInterface();
             return references.ToList();
         }

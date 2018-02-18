@@ -164,5 +164,41 @@ namespace MetadataScanner.Test
 
             Assert.That(implementations.FirstOrDefault(), Is.Not.Null);
         }
+
+        [Test]
+        public void TestThatMySimpleRegistryImplementsIRegistry()
+        {
+            var testDir = TestContext.CurrentContext.TestDirectory;
+
+            var scanner = AssemblyScanner.Create(testDir + "/Assets");
+            scanner.Scan();
+
+            var assemblies = scanner.Assemblies;
+
+            var core = from assembly
+                       in assemblies
+                       where assembly.Name == "CleanIoc.Core"
+                       select assembly;
+
+            var iregistryQuery = from definition
+                                 in core.FirstOrDefault().TypeDefinitions
+                                 where definition.Name == "IRegistry"
+                                 select definition;
+
+            var iregistry = iregistryQuery.FirstOrDefault();
+
+            var lib = from assembly
+                      in assemblies
+                      where assembly.Name == "CleanIoc.Sample.Library"
+                      select assembly;
+
+            var simpleRegistry = from type
+                                 in lib.FirstOrDefault().TypeDefinitions
+                                 where type.Name == "MySimpleRegistry"
+                                 select type;
+
+            Assert.That(simpleRegistry.FirstOrDefault(), Is.Not.Null);
+            Assert.That(simpleRegistry.FirstOrDefault().ImplementsInterface(iregistry));
+        }
     }
 }

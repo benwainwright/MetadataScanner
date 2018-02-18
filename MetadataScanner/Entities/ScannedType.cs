@@ -23,7 +23,19 @@
 
         private readonly string name;
 
-        private IType target;
+        private IType _target;
+
+        private IType target
+        {
+            get
+            {
+                return _target;
+            }
+            set
+            {
+                _target = value;
+            }
+        }
 
         public ScannedType(
             int token,
@@ -33,7 +45,8 @@
             IAssembly assembly = null,
             IType baseType = null,
             TypeAttributes attributes = default(TypeAttributes),
-            List<IType> interfaces = null)
+            List<IType> interfaces = null,
+            ResolutionStatus resolutionStatus = default(ResolutionStatus))
         {
             Token = token;
             this.isLocal = isLocal;
@@ -43,6 +56,7 @@
             this.attributes = attributes;
             this.assembly = assembly;
             this.interfaces = interfaces;
+            ResolutionStatus = resolutionStatus;
         }
 
         public ScannedType(int token)
@@ -82,11 +96,12 @@
 
         public void ResolveExternal(Dictionary<int, IType> entities)
         {
-            if (ResolutionStatus == ResolutionStatus.UnResolved && !IsLocal) {
+            if (!IsLocal && ResolutionStatus == ResolutionStatus.UnResolved) {
                 var query = from type
                             in entities.Values
                             where type.Name.Equals(name, StringComparison.InvariantCulture) &&
-                                  type.Namespace.Equals(definedNamespace, StringComparison.InvariantCulture)
+                                    type.Namespace.Equals(definedNamespace, StringComparison.InvariantCulture) &&
+                                    type.IsLocal
                             select type;
                 target = query.FirstOrDefault();
                 if (query.Any()) {
