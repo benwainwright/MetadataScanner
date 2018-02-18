@@ -6,7 +6,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-namespace MetadataScanner.Interfaces
+namespace MetadataScanner.Lib
 {
     using System;
     using System.Collections.Generic;
@@ -14,8 +14,8 @@ namespace MetadataScanner.Interfaces
     using System.Reflection;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
-    using MetadataScanner.Entities;
     using MetadataScanner.Enums;
+    using MetadataScanner.Interfaces;
 
     internal class ScannedAssembly : IAssembly
     {
