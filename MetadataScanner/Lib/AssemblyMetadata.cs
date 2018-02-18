@@ -90,7 +90,7 @@ namespace MetadataScanner.Interfaces
             typeDefinitions.ForEach(item => allTypes.Add(item.Token, item));
             typeReferences = TypeRef.LoadReferences(reader, assemblyReferences);
             typeReferences.ForEach(item => allTypes.Add(item.Token, item));
-            LinkTypes(allTypes);
+            ResolveTypeReferences(allTypes);
         }
 
         public override string ToString()
@@ -98,17 +98,17 @@ namespace MetadataScanner.Interfaces
             return $"{Name} {Version}";
         }
 
-    private static MemoryMappedFile LoadAssembly(string filename, out long length, out MemoryMappedFileAccess access)
-    {
-        var fileInfo = new FileInfo(filename);
-        length = fileInfo.Length;
-        var mapName = MapNamePrefix + fileInfo.Name;
-        var mode = FileMode.Open;
-        access = MemoryMappedFileAccess.Read;
-        return MemoryMappedFile.CreateFromFile(filename, mode, mapName, length, access);
-    }
+        private static MemoryMappedFile LoadAssembly(string filename, out long length, out MemoryMappedFileAccess access)
+        {
+            var fileInfo = new FileInfo(filename);
+            length = fileInfo.Length;
+            var mapName = MapNamePrefix + fileInfo.Name;
+            var mode = FileMode.Open;
+            access = MemoryMappedFileAccess.Read;
+            return MemoryMappedFile.CreateFromFile(filename, mode, mapName, length, access);
+        }
 
-        private void LinkTypes(Dictionary<int, ILocalTypeEntity> types)
+        private void ResolveTypeReferences(Dictionary<int, ILocalTypeEntity> types)
         {
             foreach (var type in typeDefinitions) {
                 type.ResolveBaseType(types);
