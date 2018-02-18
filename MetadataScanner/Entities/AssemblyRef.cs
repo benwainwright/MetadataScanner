@@ -40,13 +40,15 @@ namespace MetadataScanner.Interfaces
 
         public AssemblyFlags Flags { get; }
 
-        public static List<AssemblyRef> LoadReferences(MetadataReader reader)
+        public static Dictionary<int, AssemblyRef> LoadReferences(MetadataReader reader)
         {
             var query = from reference
                         in reader.AssemblyReferences
                         select new AssemblyRef(reader, reference);
 
-            return query.ToList();
+            return query.ToDictionary(
+                reference => reference.Token,
+                reference => reference);
         }
 
         public void LinkAssemblyMetaData(IEnumerable<IAssembly> assemblies)

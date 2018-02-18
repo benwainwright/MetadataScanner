@@ -10,6 +10,7 @@ namespace MetadataScanner.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.IO;
     using System.IO.MemoryMappedFiles;
     using System.Linq;
@@ -22,11 +23,13 @@ namespace MetadataScanner.Interfaces
     {
         private const string MapNamePrefix = "ASSEMBLY_SCANNER_MAP_";
 
-        private List<AssemblyRef> assemblyReferences;
+        private Dictionary<int, AssemblyRef> assemblyReferences;
 
         private List<TypeDef> typeDefinitions;
 
         private List<TypeRef> typeReferences;
+
+        private Dictionary<int, ILocalTypeEntity> allTypes;
 
         public AssemblyMetadata(
             string path,
@@ -45,7 +48,7 @@ namespace MetadataScanner.Interfaces
 
         public List<byte> PublicKey { get; private set; }
 
-        public IEnumerable<IAssemblyRef> AssemblyReferences => assemblyReferences;
+        public IEnumerable<IAssemblyRef> AssemblyReferences => assemblyReferences.Values;
 
         public IEnumerable<ITypeDef> TypeDefinitions => typeDefinitions;
 
@@ -67,8 +70,8 @@ namespace MetadataScanner.Interfaces
             MetadataReaderOptions options,
             MetadataStringDecoder decoder)
         {
-            using (var file = LoadAssembly(filename, out var length, out var access)) {
-                using (var stream = file.CreateViewStream(0, length, access)) {
+        using (var file = LoadAssembly(filename, out var length, out var access)) {
+            using (var stream = file.CreateViewStream(0, length, access)) {
                     var headers = new PEHeaders(stream);
                     var start = (byte*)0;
                     stream.SafeMemoryMappedViewHandle.AcquirePointer(ref start);
@@ -84,8 +87,10 @@ namespace MetadataScanner.Interfaces
             ParseAssemblyDefinition(reader);
             assemblyReferences = AssemblyRef.LoadReferences(reader);
             typeDefinitions = TypeDef.LoadDefinitions(reader);
+            typeDefinitions.ForEach(item => allTypes.Add(item.Token, item));
             typeReferences = TypeRef.LoadReferences(reader, assemblyReferences);
-            LinkTypes(typeDefinitions, typeReferences);
+            typeReferences.ForEach(item => allTypes.Add(item.Token, item));
+            LinkTypes(allTypes);
         }
 
         public override string ToString()
@@ -93,25 +98,21 @@ namespace MetadataScanner.Interfaces
             return $"{Name} {Version}";
         }
 
-        private static MemoryMappedFile LoadAssembly(string filename, out long length, out MemoryMappedFileAccess access)
-        {
-            var fileInfo = new FileInfo(filename);
-            length = fileInfo.Length;
-            var mapName = MapNamePrefix + fileInfo.Name;
-            var mode = FileMode.Open;
-            access = MemoryMappedFileAccess.Read;
-            return MemoryMappedFile.CreateFromFile(filename, mode, mapName, length, access);
-        }
+    private static MemoryMappedFile LoadAssembly(string filename, out long length, out MemoryMappedFileAccess access)
+    {
+        var fileInfo = new FileInfo(filename);
+        length = fileInfo.Length;
+        var mapName = MapNamePrefix + fileInfo.Name;
+        var mode = FileMode.Open;
+        access = MemoryMappedFileAccess.Read;
+        return MemoryMappedFile.CreateFromFile(filename, mode, mapName, length, access);
+    }
 
-        private static void LinkTypes(IEnumerable<TypeDef> definitions, IEnumerable<TypeRef> references)
+        private void LinkTypes(Dictionary<int, ILocalTypeEntity> types)
         {
-            var allTypes = new List<LocalTypeEntity>();
-            allTypes.AddRange(definitions);
-            allTypes.AddRange(references);
-
-            foreach (var type in definitions) {
-                type.LinkBaseType(allTypes);
-                type.LinkInterfaceImplementations(allTypes);
+            foreach (var type in typeDefinitions) {
+                type.LinkBaseType(types);
+                type.LinkInterfaceImplementations(types);
             }
         }
 

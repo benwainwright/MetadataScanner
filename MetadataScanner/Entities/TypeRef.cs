@@ -18,14 +18,14 @@ namespace MetadataScanner.Interfaces
 
     internal class TypeRef : LocalTypeEntity, ITypeRef
     {
-        public TypeRef(MetadataReader reader, TypeReferenceHandle handle, IEnumerable<AssemblyRef> assemblies)
+        public TypeRef(MetadataReader reader, TypeReferenceHandle handle, Dictionary<int, AssemblyRef> assemblies)
             : base(
                 reader.GetString(reader.GetTypeReference(handle).Name),
                 reader.GetString(reader.GetTypeReference(handle).Namespace),
                 reader.GetToken(handle))
         {
             var reference = reader.GetTypeReference(handle);
-            Assembly = GetAssembly(assemblies, reader.GetToken(reference.ResolutionScope));
+            Assembly = assemblies[reader.GetToken(reference.ResolutionScope)];
             Definition = new TypeDef(Name, DeclaredNamespace);
         }
 
@@ -33,7 +33,7 @@ namespace MetadataScanner.Interfaces
 
         public ITypeDef Definition { get; private set; }
 
-        public static List<TypeRef> LoadReferences(MetadataReader reader, IEnumerable<AssemblyRef> assemblies)
+        public static List<TypeRef> LoadReferences(MetadataReader reader, Dictionary<int, AssemblyRef> assemblies)
         {
             var query = from type
                         in reader.TypeReferences
@@ -76,16 +76,6 @@ namespace MetadataScanner.Interfaces
         public override string ToString()
         {
             return $"{Name}";
-        }
-
-        private static IAssemblyRef GetAssembly(IEnumerable<IAssemblyRef> assemblies, int token)
-        {
-            var query = from assembly
-                        in assemblies
-                        where assembly.Token == token
-                        select assembly;
-
-            return query.FirstOrDefault();
         }
     }
 }

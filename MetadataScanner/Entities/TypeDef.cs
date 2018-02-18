@@ -21,7 +21,7 @@ namespace MetadataScanner.Interfaces
     {
         private readonly TypeDefinition definition;
 
-        private List<LocalTypeEntity> interfaceImplementations = new List<LocalTypeEntity>();
+        private List<ILocalTypeEntity> interfaceImplementations = new List<ILocalTypeEntity>();
 
         public TypeDef(MetadataReader reader, TypeDefinitionHandle handle)
             : base(
@@ -61,7 +61,6 @@ namespace MetadataScanner.Interfaces
             var query = from definition
                         in reader.TypeDefinitions
                         select new TypeDef(reader, definition);
-
             return query.ToList();
         }
 
@@ -90,39 +89,29 @@ namespace MetadataScanner.Interfaces
             return false;
         }
 
-        public void LinkBaseType(List<LocalTypeEntity> types)
+        public void LinkBaseType(Dictionary<int, ILocalTypeEntity> types)
         {
             if (BaseType.ResolutionStatus == ResolutionStatus.Resolved) {
                 return;
             }
 
-            var query = from type
-                        in types
-                        where type.Token == BaseType.Token
-                        select type;
-
-            BaseType = query.FirstOrDefault();
+            BaseType = types[BaseType.Token];
         }
 
-        public void LinkInterfaceImplementations(List<LocalTypeEntity> types)
+        public void LinkInterfaceImplementations(Dictionary<int, ILocalTypeEntity> types)
         {
             var unresolved = from implementation
                              in interfaceImplementations
                              where implementation.ResolutionStatus == ResolutionStatus.UnResolved
                              select implementation;
 
-            var remove = new List<LocalTypeEntity>();
-            var resolved = new List<LocalTypeEntity>();
+            var remove = new List<ILocalTypeEntity>();
+            var resolved = new List<ILocalTypeEntity>();
 
             foreach (var implementation in unresolved.ToList()) {
-                var query = from type
-                            in types
-                            where type.Token == implementation.Token
-                            select type;
-
-                if (query.Any()) {
+                if (types.ContainsKey(implementation.Token)) {
                     remove.Add(implementation);
-                    resolved.Add(query.First());
+                    resolved.Add(types[implementation.Token]);
                 }
             }
 
