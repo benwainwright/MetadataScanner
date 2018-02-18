@@ -130,6 +130,8 @@ namespace MetadataScanner.Entities
                 throw new InvalidOperationException($"{entity} is not an interface type");
             }
 
+            // Based on the wording of the method name since an interface
+            // doesn't have an *implementation*
             if (entity == this) {
                 return false;
             }
