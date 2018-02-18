@@ -111,8 +111,8 @@ namespace MetadataScanner.Interfaces
         private void LinkTypes(Dictionary<int, ILocalTypeEntity> types)
         {
             foreach (var type in typeDefinitions) {
-                type.LinkBaseType(types);
-                type.LinkInterfaceImplementations(types);
+                type.ResolveBaseType(types);
+                type.ResolveInterfaceImplementations(types);
             }
         }
 

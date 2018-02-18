@@ -89,7 +89,7 @@ namespace MetadataScanner.Interfaces
             return false;
         }
 
-        public void LinkBaseType(Dictionary<int, ILocalTypeEntity> types)
+        public void ResolveBaseType(Dictionary<int, ILocalTypeEntity> types)
         {
             if (BaseType.ResolutionStatus == ResolutionStatus.Resolved) {
                 return;
@@ -100,7 +100,7 @@ namespace MetadataScanner.Interfaces
             }
         }
 
-        public void LinkInterfaceImplementations(Dictionary<int, ILocalTypeEntity> types)
+        public void ResolveInterfaceImplementations(Dictionary<int, ILocalTypeEntity> types)
         {
             var unresolved = from implementation
                              in interfaceImplementations

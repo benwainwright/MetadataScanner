@@ -26,9 +26,9 @@ namespace MetadataScanner.Test
         [Test]
         public void TestScannerFindsTheDummyAssembly()
         {
-            var dir = TestContext.CurrentContext.TestDirectory;
+            var testDir = TestContext.CurrentContext.TestDirectory;
 
-            var scanner = AssemblyScanner.Create(dir);
+            var scanner = AssemblyScanner.Create(testDir + "/Assets");
             scanner.Scan();
 
             var mockAssembly = new Mock<IAssembly>();
@@ -38,7 +38,7 @@ namespace MetadataScanner.Test
 
             var assemblies = scanner.Assemblies;
             Assert.That(assemblies, Is.Not.Null);
-            Assert.That(assemblies, Contains.Item(mockAssembly).Using<IAssembly>(this));
+            Assert.That(assemblies, Contains.Item(mockAssembly).Using(this));
         }
     }
 }
