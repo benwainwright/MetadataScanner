@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 	  <CodeAnalysisRuleSet>../analysis.ruleset</CodeAnalysisRuleSet>  
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>  
-    <AssemblyName>MetadataScanner</AssemblyName>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>  
+	  <AssemblyName>MetadataScanner</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>
@@ -34,6 +34,11 @@
     <PackageProjectUrl>https://github.com/benwainwright/MetadataScanner</PackageProjectUrl>
     <RepositoryUrl>https://github.com/benwainwright/MetadataScanner</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
 </Project>
