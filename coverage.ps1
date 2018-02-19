@@ -42,10 +42,14 @@ function Run-All-Tests-In-Root {
 }
 
 function Delete-Files-In {
-    Param($directory)
+    Param($directory, $filter)
+
+    if(!$filter) {
+        $filter = "*"
+    }
 
     if($directory) {
-        Get-ChildItem "$directory" -File -Filter "*.xml" | ForEach-Object {
+        Get-ChildItem "$directory" -File -Filter "$filter" | ForEach-Object {
             Remove-Item -Path $_.FullName
         }
     }
@@ -59,7 +63,7 @@ function Run-Tests-In {
     $root = (Get-Item -Path ".\" -Verbose).FullName
     $coverageDir = "$root\$output"
     if(Test-Path -Path "$coverageDir") {
-        Delete-Files-In -directory "$coverageDir"
+        Delete-Files-In -directory "$coverageDir" -filter "*.xml"
     }
     $baseName = (Get-Item -Path "$directory").BaseName
 
@@ -72,7 +76,8 @@ function Run-Tests-In {
                                      " -returntargetcode" +
                                      " -skipautoprops" +
                                      " -hideskipped:All" +
-                                     " -excludebyfile:`"*.Test.dll`""                                   
+                                     " -filter:`"+[*]* -[*Test*]*`""
+                          
 
     Write-Debug "Running command - $runOpenCoverCommand"
     Invoke-Expression $runOpenCoverCommand
