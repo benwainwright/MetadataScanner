@@ -21,7 +21,8 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-[Cc]overage/
+[Cc]overage/raw
+[Cc]overage/reports
 
 # Visual Studio 2015 cache/options directory
 .vs/

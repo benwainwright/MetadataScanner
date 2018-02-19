@@ -13,7 +13,7 @@ if($filter) {
 
 function Main {
     Run-All-Tests-In-Root -output "Coverage\raw"
-    Generate-Reports-From-Reports-Dir -raw "Coverage\raw" -output "Coverage\reports"
+    Generate-Reports-From-Reports-Dir -raw "Coverage\raw" -output "Coverage\reports" -history "Coverage\history" 
 }
 
 function Run-All-Tests-In-Root {
@@ -76,7 +76,7 @@ function Run-Tests-In {
 
 function Generate-Reports-From-Reports-Dir {
 
-    Param($raw, $output)
+    Param($raw, $output, $history)
 
     $root = (Get-Item -Path ".\" -Verbose).FullName
 
@@ -99,6 +99,13 @@ function Generate-Reports-From-Reports-Dir {
                                               " -reports:`"$reports`"" +
                                               " -verbosity:Error"
 
+	if($history) {
+		$history = "$root\$history"	
+		if(!(Test-Path -Path "$history")){
+			New-Item -ItemType directory -Path ""$history""
+		}	
+		$generateReportsCommand  += " -historydir:`"$history`""
+	}
     Write-Debug "Running command - $generateReportsCommand"
     Invoke-Expression $generateReportsCommand
 }
