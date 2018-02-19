@@ -30,6 +30,7 @@ namespace MetadataScanner.Lib
         public ScannedAssembly(int token)
         {
             Token = token;
+            ResolutionStatus = ResolutionStatus.UnResolved;
         }
 
         public ScannedAssembly(AssemblyReferenceHandle handle, MetadataReader reader)
