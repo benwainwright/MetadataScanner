@@ -1,15 +1,17 @@
-﻿$dotnet = "C:\Program Files\dotnet\dotnet.exe"
+﻿# Path to the dotnet executable
+$dotnet = "C:\Program Files\dotnet\dotnet.exe"
+
+# Arguments to be passed to dotnet in order to initiate the test run
+$targetargs = "test"
+
+# Path to the opencover executable
 $openCover = "C:\Users\bwain\.nuget\packages\opencover\4.6.519\tools\OpenCover.Console.exe"
+
+# Path to the reportGenerator executable
 $reportGenerator = "C:\Users\bwain\.nuget\packages\reportgenerator\3.1.2\tools\ReportGenerator.exe"
 
-$targetargs = "test"
-$filter = ""
+# Base name for report xml files (they will be named '<test.assembly.name>.$coverageFile')
 $coverageFile = "Coverage.xml"
-$coverageDirRelative = "Coverage"
-
-if($filter) {
-    $runOpenCoverCommand += " -filter:$filter"
-}
 
 function Main {
     Run-All-Tests-In-Root -output "Coverage\raw"
@@ -52,6 +54,8 @@ function Delete-Files-In {
 function Run-Tests-In {
     Param($directory, $output, $filter)
 
+    $targetargs = "test"
+    $coverageFile = "Coverage.xml"
     $root = (Get-Item -Path ".\" -Verbose).FullName
     $coverageDir = "$root\$output"
     if(Test-Path -Path "$coverageDir") {
@@ -102,7 +106,7 @@ function Generate-Reports-From-Reports-Dir {
 	if($history) {
 		$history = "$root\$history"	
 		if(!(Test-Path -Path "$history")){
-			New-Item -ItemType directory -Path ""$history""
+			New-Item -ItemType directory -Path "`"$history"`"
 		}	
 		$generateReportsCommand  += " -historydir:`"$history`""
 	}
@@ -110,5 +114,4 @@ function Generate-Reports-From-Reports-Dir {
     Invoke-Expression $generateReportsCommand
 }
 
-# Run entry point function
 Main
