@@ -200,5 +200,52 @@ namespace MetadataScanner.Test
             Assert.That(simpleRegistry.FirstOrDefault(), Is.Not.Null);
             Assert.That(simpleRegistry.FirstOrDefault().ImplementsInterface(iregistry));
         }
+
+        [Test]
+        public void TestDirectInheritanceAcrossAssemblyBoundariesIsIdentifiedByIsSubclassOf()
+        {
+            var testDir = TestContext.CurrentContext.TestDirectory;
+
+            var scanner = AssemblyScanner.Create(testDir + "/Assets");
+            scanner.Scan();
+
+            var assemblies = scanner.Assemblies;
+
+            var lib = from assembly
+                      in assemblies
+                      where assembly.Name == "CleanIoc.Sample.Library"
+                      select assembly;
+
+            var simpleRegistryQuery = from type
+                                      in lib.FirstOrDefault().TypeDefinitions
+                                      where type.Name == "MySimpleRegistry"
+                                      select type;
+
+           var core = from assembly
+                      in assemblies
+                      where assembly.Name == "CleanIoc.Core"
+                      select assembly;
+
+            var registryQuery = from definition
+                                in core.FirstOrDefault().TypeDefinitions
+                                where definition.Name == "Registry"
+                                select definition;
+
+            var simpleRegistry = simpleRegistryQuery.FirstOrDefault();
+            var registry = registryQuery.FirstOrDefault();
+            Assert.That(simpleRegistry.IsSubclassOf(registry));
+        }
+
+        [Ignore("Need to find some samples for this")]
+        [Test]
+        public void TestDirectInheritanceWithinAnAssemblyIsIdentifiedAsSubclassOf()
+        {
+        }
+
+        [Test]
+        public void TestIndirectInheritanceAcrossAssemblyBoundaries()
+        {
+
+        }
     }
 }
