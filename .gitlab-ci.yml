@@ -1,0 +1,5 @@
+image: microsoft/dotnet
+
+build:
+    script:
+      - dotnet build
